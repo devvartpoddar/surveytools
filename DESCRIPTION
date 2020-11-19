@@ -1,0 +1,22 @@
+Package: surveytools
+Title: Miscellaneous tools used for survey analysis at Dalberg
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Devvart",
+           family = "Poddar",
+           role = "main",
+           email = "poddardevvart@gmail.com")
+Description: What the package does (one paragraph).
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Imports:
+    srvyr,
+    magrittr,
+    tidyselect,
+    rlang,
+    purrr,
+    glue,
+    dplyr
