@@ -14,3 +14,12 @@ grouper <- function(.data) {
     dplyr::group_by_all() %>% 
     dplyr::count()
 }
+
+#' Percent
+#'
+#' Percent function from formattable package 
+#'
+#' @importFrom formattable percent
+#' @export percent
+#' @name percent
+NULL

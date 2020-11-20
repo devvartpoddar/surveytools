@@ -160,7 +160,7 @@ summariser.default <- function(.data,
     # 1 | if is character, multiply by 100
     if (!IS_NUMERIC) {
       .data <- .data %>%
-        dplyr::mutate(dplyr::across(starts_with("value"), ~ .x*100))
+        dplyr::mutate(dplyr::across(starts_with("value"), ~ percent(.x)))
     }
 
     .data <- .data %>%
