@@ -13,6 +13,12 @@
 #' 
 #' @export
 combine_columns <- function(.data, new_column_name, pattern, type = "starts_with") {
+    UseMethod("combine_columns")
+}
+
+#' @rdname combine_columns
+#' @export
+combine_columns.default <- function(.data, new_column_name, pattern, type = "starts_with") {
   # Capturing the selected column name and selecting names
   quo_column_name <- rlang::enquo(new_column_name)
   selecting_function <- switch(

@@ -2,9 +2,21 @@
 % Please edit documentation in R/summariser.R
 \name{summariser}
 \alias{summariser}
+\alias{summariser.default}
 \title{Summarise survey data}
 \usage{
 summariser(
+  .data,
+  var,
+  ...,
+  stat = c("mean", "median", "total"),
+  compare = "overall",
+  survey.design = NULL,
+  ci_level = 0.95,
+  simplify = TRUE
+)
+
+\method{summariser}{default}(
   .data,
   var,
   ...,

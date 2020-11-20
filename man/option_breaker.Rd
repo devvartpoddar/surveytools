@@ -2,9 +2,12 @@
 % Please edit documentation in R/option_breaker.R
 \name{option_breaker}
 \alias{option_breaker}
+\alias{option_breaker.default}
 \title{Option breaker}
 \usage{
 option_breaker(.data, str, to_check, group = "")
+
+\method{option_breaker}{default}(.data, str, to_check, group = "")
 }
 \arguments{
 \item{.data}{Dataframe}

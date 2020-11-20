@@ -12,7 +12,13 @@
 #' @importFrom magrittr "%>%"
 #' 
 #' @export
-option_breaker <- function(.data, str, to_check, group = ""){
+option_breaker <- function(.data, str, to_check, group = "") {
+    UseMethod("option_breaker")
+}
+
+#' @rdname option_breaker
+#' @export
+option_breaker.default <- function(.data, str, to_check, group = ""){
   if (group == ""){
     .data$group <- "All"
   } else {
@@ -27,8 +33,8 @@ option_breaker <- function(.data, str, to_check, group = ""){
   summary <- purrr::map_dfr(list_of_response, function(x) {
     .data %>% 
       dplyr::mutate(temp = .[[paste0(str, x)]]) %>%
-      # TODO: TBU with new summariser and combine columns
       combine_columns(combined, c("group", "temp")) %>%
+      # TODO: Remove summariser and add in count and percentage
       summariser(combined) %>% 
       dplyr::filter(combined != "Overall") %>% 
       dplyr::separate(combined, c("group", "temp"), sep = "\\|") %>% 
@@ -43,7 +49,7 @@ option_breaker <- function(.data, str, to_check, group = ""){
   summary <- purrr::map_dfr(list_of_response, function(x) {
     .data %>% 
       dplyr::mutate(temp = .[[paste0(str, x)]]) %>%
-      # TODO: TBU with new summariser and combine columns
+      # TODO: Remove summariser and add in count and percentage
       summariser(temp) %>%
       dplyr::mutate(group = "Overall") %>%
       dplyr::filter(temp == to_check) %>%
@@ -57,7 +63,6 @@ option_breaker <- function(.data, str, to_check, group = ""){
   
   summary <- .data %>% 
     dplyr::select(group) %>%
-    # TODO: TBU with new summariser and combine columns
     grouper() %>% 
     dplyr::rename(tempSum = n) %>% 
     dplyr::bind_rows(list("Overall", sum(.$tempSum))) %>% 

@@ -4,7 +4,7 @@ Version: 0.0.0.9000
 Authors@R: 
     person(given = "Devvart",
            family = "Poddar",
-           role = "main",
+           role = c("aut", "cre"),
            email = "poddardevvart@gmail.com")
 Description: What the package does (one paragraph).
 License: MIT + file LICENSE
@@ -21,4 +21,5 @@ Imports:
     glue,
     dplyr,
     tidyr,
-    stringr
+    stringr,
+    formattable

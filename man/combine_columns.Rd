@@ -2,9 +2,12 @@
 % Please edit documentation in R/combine_columns.R
 \name{combine_columns}
 \alias{combine_columns}
+\alias{combine_columns.default}
 \title{Combine columns}
 \usage{
 combine_columns(.data, new_column_name, pattern, type = "starts_with")
+
+\method{combine_columns}{default}(.data, new_column_name, pattern, type = "starts_with")
 }
 \arguments{
 \item{.data}{Dataframe to combine column in}

@@ -1,13 +1,4 @@
-#' test_significance
-#'
-#' Internal function to test significance of results
-#'
-#' @param .data Summarised dataframe
-#' @param compare Group::response combination to be used for comparison
-#' 
-#' @return A dataframe of summarised results for numeric variables
-#' 
-#' #' @importFrom magrittr "%>%"
+#' @importFrom magrittr "%>%"
 test_significance <- function(.data,
                               compare = compare) {
 
@@ -108,20 +99,6 @@ test_significance <- function(.data,
   return(significance_data)
 }
 
-#' Welch T test for unequal variances
-#'
-#' Internal function to summarise numeric variables
-#'
-#' @param m1 Mean of group 1
-#' @param m2 Mean of group 2
-#' @param s1 Standard deviation of group 1
-#' @param s2 Standard deviation of group 2
-#' @param n1 N for group 1
-#' @param n2 N for group 2
-#' @param m0 Diff of means to be compared against. Defaults to 0
-#' @param equal.variance Are variances of the two groups to be taken as the same
-#' 
-#' @return A dataframe of pvalues and means
 welch_ttest <- function(m1,
                          m2,
                          s1,

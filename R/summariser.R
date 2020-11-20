@@ -20,6 +20,21 @@
 summariser <- function(.data,
                        var,
                        ...,
+                       stat = c("mean", "median", "total"),
+                       compare = "overall",
+                       survey.design = NULL,
+                       ci_level = 0.95,
+                       simplify = TRUE) {
+
+  # Running method summariser
+  UseMethod("summariser")
+}
+
+#' @rdname summariser
+#' @export
+summariser.default <- function(.data,
+                       var,
+                       ...,
                        # allowed stats to ask for
                        stat = c("mean", "median", "total"),
                        # metric to compare significance against
@@ -156,19 +171,7 @@ summariser <- function(.data,
   return(.data)
 }
 
-#' summariser_numeric
-#'
-#' Internal function to summarise numeric variables
-#'
-#' @param .data Dataframe or survey data to be summarised
-#' @param var Variable within dataframe to be summarised
-#' @param group Variables to group by
-#' @param stat One of "mean", "median" or "total". Defaults to mean if not correctly provided 
-#' @param level confidence level to be summarised for
-#' 
-#' @return A dataframe of summarised results for numeric variables
-#' 
-#' #' @importFrom magrittr "%>%"
+#' @importFrom magrittr "%>%"
 summariser_numeric <- function(.data, var, group, stat, level) {
   # Summarises variables if they are numeric or logical in nature
 
@@ -233,19 +236,7 @@ summariser_numeric <- function(.data, var, group, stat, level) {
   return(summary_data)
 }
 
-#' summariser_character
-#'
-#' Internal function to summarise character variables
-#'
-#' @param .data Dataframe or survey data to be summarised
-#' @param var Variable within dataframe to be summarised
-#' @param group Variables to group by
-#' @param stat One of "mean", "median" or "total". Defaults to mean if not correctly provided 
-#' @param level confidence level to be summarised for
-#' 
-#' @return A dataframe of summarised results for numeric variables
-#' 
-#' #' @importFrom magrittr "%>%"
+#' @importFrom magrittr "%>%"
 summariser_character <- function(.data, var, group, stat, level) {
   # Summarises variable if they are character or factor in nature
 
