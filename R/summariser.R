@@ -255,7 +255,7 @@ summariser_character <- function(.data, var, group, stat, level) {
   # Sanity checks
   # 1. Converting NAs in var and group var to character
   .data <- .data %>%
-    srvyr::mutate(srvyr::across(srvyr::any_of(c(var, group)), stringr::str_replace_na))
+    srvyr::mutate(dplyr::across(dplyr::any_of(c(var, group)), stringr::str_replace_na))
 
   # Ungrouped summary
   # Creating list of responses
