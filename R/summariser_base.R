@@ -162,10 +162,10 @@ summariser_base.default <- function(.data,
           stat != "total") {
       .data <- .data %>%
         dplyr::mutate(dplyr::across(starts_with("value"), ~ percent(.x, digits = 2)))
+    } else {
+      .data <- .data %>%
+        dplyr::mutate(dplyr::across(where(is.numeric), ~round(.x, 2)))
     }
-
-    .data <- .data %>%
-      dplyr::mutate(dplyr::across(where(is.numeric), ~round(.x, 2)))
   }
 
   # Return values ----
