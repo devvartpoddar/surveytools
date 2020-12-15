@@ -2,11 +2,11 @@
 
 S3method(combine_columns,default)
 S3method(option_breaker,default)
-S3method(summariser,default)
+S3method(summariser_base,default)
 export(combine_columns)
 export(grouper)
 export(option_breaker)
 export(percent)
-export(summariser)
+export(summariser_base)
 importFrom(formattable,percent)
 importFrom(magrittr,"%>%")

@@ -17,7 +17,7 @@
 #' @importFrom magrittr "%>%"
 #' 
 #' @export
-summariser <- function(.data,
+summariser_base <- function(.data,
                        var,
                        ...,
                        stat = c("mean", "median", "total"),
@@ -26,13 +26,13 @@ summariser <- function(.data,
                        ci_level = 0.95,
                        simplify = TRUE) {
 
-  # Running method summariser
-  UseMethod("summariser")
+  # Running method summariser_base
+  UseMethod("summariser_base")
 }
 
-#' @rdname summariser
+#' @rdname summariser_base
 #' @export
-summariser.default <- function(.data,
+summariser_base.default <- function(.data,
                        var,
                        ...,
                        # allowed stats to ask for
@@ -158,9 +158,10 @@ summariser.default <- function(.data,
   # Simplify ----
   if (simplify){
     # 1 | if is character, multiply by 100
-    if (!IS_NUMERIC) {
+    if (!IS_NUMERIC &
+          stat != "total") {
       .data <- .data %>%
-        dplyr::mutate(dplyr::across(starts_with("value"), ~ percent(.x)))
+        dplyr::mutate(dplyr::across(starts_with("value"), ~ percent(.x, digits = 2)))
     }
 
     .data <- .data %>%
@@ -208,7 +209,8 @@ summariser_numeric <- function(.data, var, group, stat, level) {
               N = srvyr::unweighted(dplyr::n())) %>%
     srvyr::mutate(group = "Overall",
            response = "Overall") %>%
-    srvyr::select(group, response, N, value, everything())
+    srvyr::select(group, response, N, value, everything()) %>% 
+    dplyr::arrange(-value)
 
   # Grouped summary
   if (length(group) > 0) {
@@ -276,7 +278,8 @@ summariser_character <- function(.data, var, group, stat, level) {
       srvyr::mutate(group = "Overall",
              response = x) %>%
       srvyr::select(group, response, N, value, everything())
-  })
+  }) %>% 
+    dplyr::arrange(-value)
 
   # Grouped summary
   if (length(group) > 0) {
