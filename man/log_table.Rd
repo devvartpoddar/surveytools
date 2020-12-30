@@ -2,10 +2,25 @@
 % Please edit documentation in R/logging.r
 \name{log_table}
 \alias{log_table}
-\title{Function to render a data table using formattable}
+\alias{log_table.default}
+\alias{log_table.svyt_df}
+\title{Log table using formattable}
 \usage{
-log_table(.data, ..., log = NULL)
+log_table(.data, header = "", ..., log = NULL)
+
+\method{log_table}{default}(.data, header = "", ..., log = NULL)
+
+\method{log_table}{svyt_df}(.data, header = "", ..., log = NULL)
+}
+\arguments{
+\item{.data}{Dataframe or summarised outputs to log to table}
+
+\item{header}{Header for the table}
+
+\item{...}{additional options passed to formattable::format_table()}
+
+\item{log}{Overwrite default log that gets logged to and rendered}
 }
 \description{
-Function to render a data table using formattable
+Log a table of results using formattable. Has custom methods for the common summariser outputs as well as a generic method for all tables
 }

@@ -2,10 +2,13 @@
 % Please edit documentation in R/logging.r
 \name{log_init}
 \alias{log_init}
-\title{Function to initialise a new logger - defines the output file and options available, if any}
+\title{Initialise logging}
 \usage{
 log_init(path)
 }
+\arguments{
+\item{path}{path / filename of the log to initialise}
+}
 \description{
-Function to initialise a new logger - defines the output file and options available, if any
+Initialise html log by provide path to log. No extension is needed - will automate to html.
 }

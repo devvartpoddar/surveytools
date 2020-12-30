@@ -9,7 +9,11 @@
     text = "---\n title: 'Default log'\n ---"
     )
 
-#' Function to initialise a new logger - defines the output file and options available, if any
+#' Initialise logging
+#' 
+#' Initialise html log by provide path to log. No extension is needed - will automate to html. 
+#' 
+#' @param path path / filename of the log to initialise
 #' 
 #' @export
 log_init <- function(path) {
@@ -50,12 +54,15 @@ log_init <- function(path) {
     assign("log_name", file_name, .log_env)
 
     # returning cfile
-    return(log_list)
+    invisible(log_list)
 }  
 
-#' Function to render a log based on the input file
+#' Render log
 #' 
-#' @export
+#' Render the definied log file using rmarkdown with default options
+#' 
+#' @param log_name Name of the log to render. Defaults to last called log file
+#' 
 log_render <- function(log_name = "default") {
 
     # Get the list of text and path name based on the log_name called
@@ -84,10 +91,23 @@ log_render <- function(log_name = "default") {
     } 
 }
 
-#' Function to render a data table using formattable
+#' Log table using formattable
+#' 
+#' Log a table of results using formattable. Has custom methods for the common summariser outputs as well as a generic method for all tables
+#' 
+#' @param .data Dataframe or summarised outputs to log to table
+#' @param header Header for the table
+#' @param ... additional options passed to formattable::format_table()
+#' @param log Overwrite default log that gets logged to and rendered
 #' 
 #' @export
-log_table <- function(.data, ..., log = NULL) {
+log_table <- function(.data, header = "", ..., log = NULL) {
+      UseMethod("log_table")
+}
+
+#' @rdname log_table
+#' @export
+log_table.default <- function(.data, header = "", ..., log = NULL) {
     # Force data
     force(.data)
 
@@ -113,19 +133,61 @@ log_table <- function(.data, ..., log = NULL) {
 
     log_list <- get(log_name, envir = .log_env)
 
-    log_list$text <- paste(log_list$text, tmp, sep = "\n")
+    log_list$text <- paste(log_list$text, glue::glue("### {header}"), tmp, sep = "\n")
 
     # assign the value back to log list in the original env
     assign(glue::glue("{log_name}"), log_list, .log_env) 
 
     # render the temp file
-    log_render(log_name)
+    suppressMessages(log_render(log_name))
 
     # Return the original table invisibly
     invisible(.data)
 }
 
-#' Function to add text to output
+#' @rdname log_table
+#' @export
+log_table.svyt_df <- function(.data, header = "", ..., log = NULL) {
+    # Special class for summariser outputs
+
+    # 1. Modify the data to remove value se, and merge value_low and value_upp into a single piece
+    .data <- .data %>%
+        dplyr::mutate(value_range = glue::glue("[{value_low} - {value_upp}]"),
+            pvalue = ifelse(is.na(pvalue) | is.nan(pvalue), 1, pvalue),
+            sgnf = dplyr::case_when(
+                sgnf %in% c("-----") ~ "",
+                sgnf %in% c("<<--|") ~ "   <|",
+                TRUE ~ sgnf
+                )
+            ) %>% 
+        dplyr::select(group, response, N, value, value_range, pvalue, sgnf) 
+    
+    # 2. Send to log_table default with additional formats
+    log_table.default(.data, 
+        header = header,
+
+        # List of formatters for formattable package
+        formatters = list(
+            value = formattable::normalize_bar("#6CA5BF"),
+            formattable::area(row = -1, col = "N")       ~ formattable::color_tile("#f8c2da9c", "#f069a69c"),
+            pvalue = formattable::formatter("span", 
+                style = x ~ formattable::style(color = ifelse(x <= 0.01, "#45e0aafa", "#D9D6D6"), 
+                    font.weight = ifelse(x <= 0.01, "bold", ""))
+            ),
+            sgnf = formattable::formatter("span", 
+                style = ~ formattable::style(color = ifelse(pvalue <= 0.01, "#45e0aafa", "#D9D6D6"), 
+                    font.weight = ifelse(pvalue <= 0.01, "bold", ""))
+            )
+        )
+    )
+}
+
+#' Log text 
+#' 
+#' Log text using rmarkdown. Since it uses rmarkdown to render, a whole range of markdown as well as html are supported
+#' 
+#' @param ... text to be rendered using rmarkdown
+#' @param log Overwrite default log that gets logged to and rendered
 #' 
 #' @export
 log_text <- function(..., log = NULL) {
@@ -153,13 +215,12 @@ log_text <- function(..., log = NULL) {
     log_list <- get(log_name, envir = .log_env)
 
     log_list$text <- paste(log_list$text, text, sep = "\n\n")
-    print(log_list$text)
 
     # assign the value back to log list in the original env
     assign(glue::glue("{log_name}"), log_list, .log_env) 
 
     # render the temp file
-    log_render(log_name)
+    suppressMessages(log_render(log_name))
 
-    return(text)
+    invisible(text)
 }
