@@ -133,7 +133,7 @@ log_table.default <- function(.data, header = "", ..., log = NULL) {
 
     log_list <- get(log_name, envir = .log_env)
 
-    log_list$text <- paste(log_list$text, glue::glue("### {header}"), tmp, sep = "\n")
+    log_list$text <- paste(log_list$text, glue::glue("### {header}"), tmp, sep = "\n\n")
 
     # assign the value back to log list in the original env
     assign(glue::glue("{log_name}"), log_list, .log_env) 
