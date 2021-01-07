@@ -83,7 +83,8 @@ log_render <- function(log_name = "default") {
                 toc = TRUE,
                 toc_float = TRUE
             ),
-            output_dir = log_list$path
+            output_dir = log_list$path,
+            encoding="UTF-8-BOM"
         )
 
         # Remove the created temp file
