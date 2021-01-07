@@ -4,7 +4,7 @@
 \alias{log_text}
 \title{Log text}
 \usage{
-log_text(..., log = NULL)
+log_text(..., log = NULL, print = getOption("surveytools.force_print"))
 }
 \arguments{
 \item{...}{text to be rendered using rmarkdown}

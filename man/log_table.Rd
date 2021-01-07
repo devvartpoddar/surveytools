@@ -6,11 +6,29 @@
 \alias{log_table.svyt_df}
 \title{Log table using formattable}
 \usage{
-log_table(.data, header = "", ..., log = NULL)
+log_table(
+  .data,
+  header = "",
+  ...,
+  log = NULL,
+  print = getOption("surveytools.force_print")
+)
 
-\method{log_table}{default}(.data, header = "", ..., log = NULL)
+\method{log_table}{default}(
+  .data,
+  header = "",
+  ...,
+  log = NULL,
+  print = getOption("surveytools.force_print")
+)
 
-\method{log_table}{svyt_df}(.data, header = "", ..., log = NULL)
+\method{log_table}{svyt_df}(
+  .data,
+  header = "",
+  ...,
+  log = NULL,
+  print = getOption("surveytools.force_print")
+)
 }
 \arguments{
 \item{.data}{Dataframe or summarised outputs to log to table}

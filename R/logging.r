@@ -69,27 +69,28 @@ log_render <- function(log_name = "default") {
     log_list <- get(log_name, envir = .log_env)
 
     # create a tempfile to send the text from the log to
-    temp_file <- tempfile(tmpdir = log_list$path)
+    f   <- tempfile()
+    con <- file(f, open = "w+", encoding = "native.enc")
 
-    crd_file <- file.create(temp_file)
-    if (crd_file) {
+    text <- enc2utf8(log_list$text)
+    writeLines(text, con = con, useBytes = TRUE)
+    close(con)
 
-        # Cat the text to the temporary file
-        cat(log_list$text, file = temp_file)
+    # Get the path and send to the required path
+    path <- normalizePath(log_list$path)
 
-        rmarkdown::render(temp_file,
-            output_file = log_name,
-            output_format = rmarkdown::html_document(
-                toc = TRUE,
-                toc_float = TRUE
-            ),
-            output_dir = log_list$path,
-            encoding="UTF-8-BOM"
-        )
+    rmarkdown::render(f,
+        output_file   = log_name,
+        output_format = rmarkdown::html_document(
+            toc       = TRUE,
+            toc_float = TRUE
+        ),
+        output_dir    = path,
+        quiet         = TRUE
+    )
 
-        # Remove the created temp file
-        unlink(temp_file)
-    } 
+    # Remove the created temp file
+    unlink(f)
 }
 
 #' Log table using formattable
@@ -102,13 +103,13 @@ log_render <- function(log_name = "default") {
 #' @param log Overwrite default log that gets logged to and rendered
 #' 
 #' @export
-log_table <- function(.data, header = "", ..., log = NULL) {
+log_table <- function(.data, header = "", ..., log = NULL, print = getOption("surveytools.force_print")) {
       UseMethod("log_table")
 }
 
 #' @rdname log_table
 #' @export
-log_table.default <- function(.data, header = "", ..., log = NULL) {
+log_table.default <- function(.data, header = "", ..., log = NULL, print = getOption("surveytools.force_print")) {
     # Force data
     force(.data)
 
@@ -140,7 +141,7 @@ log_table.default <- function(.data, header = "", ..., log = NULL) {
     assign(glue::glue("{log_name}"), log_list, .log_env) 
 
     # render the temp file
-    suppressMessages(log_render(log_name))
+    if (print) suppressMessages(log_render(log_name))
 
     # Return the original table invisibly
     invisible(.data)
@@ -148,7 +149,7 @@ log_table.default <- function(.data, header = "", ..., log = NULL) {
 
 #' @rdname log_table
 #' @export
-log_table.svyt_df <- function(.data, header = "", ..., log = NULL) {
+log_table.svyt_df <- function(.data, header = "", ..., log = NULL, print = getOption("surveytools.force_print")) {
     # Special class for summariser outputs
 
     # 1. Modify the data to remove value se, and merge value_low and value_upp into a single piece
@@ -179,7 +180,8 @@ log_table.svyt_df <- function(.data, header = "", ..., log = NULL) {
                 style = ~ formattable::style(color = ifelse(pvalue <= 0.01, "#45e0aafa", "#D9D6D6"), 
                     font.weight = ifelse(pvalue <= 0.01, "bold", ""))
             )
-        )
+        ),
+        print = print
     )
 }
 
@@ -191,7 +193,7 @@ log_table.svyt_df <- function(.data, header = "", ..., log = NULL) {
 #' @param log Overwrite default log that gets logged to and rendered
 #' 
 #' @export
-log_text <- function(..., log = NULL) {
+log_text <- function(..., log = NULL, print = getOption("surveytools.force_print")) {
 
     # Capture text and paste using sep
     text = list(...) %>% 
@@ -221,7 +223,29 @@ log_text <- function(..., log = NULL) {
     assign(glue::glue("{log_name}"), log_list, .log_env) 
 
     # render the temp file
-    suppressMessages(log_render(log_name))
+    if (print) suppressMessages(log_render(log_name))
 
     invisible(text)
+}
+
+#' Log Print 
+#' 
+#' Force render rmarkdown to print html
+#' 
+#' @param log Name of log to force print. Will default to last value
+#' 
+#' @export
+log_print<- function(log = NULL) {
+    # Function to force print for a log
+
+    # Get name and text of current log 
+    if (is.null(log)) {
+        log_name <- get("log_name", envir = .log_env)
+    } else {
+        log_name <- log
+    }
+
+    log_list <- get(log_name, envir = .log_env)
+
+    suppressMessages(log_render(log_name))
 }
