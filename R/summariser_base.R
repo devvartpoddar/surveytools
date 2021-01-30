@@ -168,6 +168,9 @@ summariser_base.default <- function(.data,
     }
   }
 
+  # Add a class of svyt_df to the output
+  class(.data) <- c("svyt_df", class(.data))
+
   # Return values ----
   return(.data)
 }
@@ -227,7 +230,7 @@ summariser_numeric <- function(.data, var, group, stat, level) {
                   N = srvyr::unweighted(dplyr::n())) %>%
         srvyr::mutate(group = group_var,
                response = !!rlang::sym(group_var)) %>%
-        srvyr::select(group, response, N, value, everything(), -!!sym(group_var))
+        srvyr::select(group, response, N, value, everything(), -!!rlang::sym(group_var))
       }
     )
 
@@ -303,7 +306,7 @@ summariser_character <- function(.data, var, group, stat, level) {
           srvyr::mutate(group = case_when(
             # If more than one groups are provided, attach a group name finder, else just the normal works
             length(group) > 1 ~ paste0(group_var, " | ", !!rlang::sym(group_var)),
-            TRUE ~ as.character(!!sym(group_var))
+            TRUE ~ as.character(!!rlang::sym(group_var))
             ),
             response = x) %>%
           srvyr::select(group, response, N, value, everything(), - !!rlang::sym(group_var))

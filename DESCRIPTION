@@ -22,4 +22,5 @@ Imports:
     dplyr,
     tidyr,
     stringr,
-    formattable
+    formattable,
+    rmarkdown
