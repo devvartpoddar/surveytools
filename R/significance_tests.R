@@ -2,12 +2,14 @@
 test_significance <- function(.data,
                               compare = compare) {
 
-  # Function to test significance of a given mean against comparable or default values. Uses welch t test
-  # TODO: Change default compare row by type; if numeric use the overall row, and if categorical,
+  # Function to test significance of a given mean against comparable or default values. Uses welch t test # nolint
+  # TODO: Change default compare row by type; if numeric use the overall row, and if categorical, # nolint
   # use the row that meets the response
 
   # CHECK if data is 0 rows, return data
-  if (nrow(.data) == 0) return(.data)
+  if (nrow(.data) == 0) {
+    return(.data)
+  }
 
   # convert compare to lowercase, and trim ws
   compare <- trimws(compare) %>%
@@ -29,54 +31,65 @@ test_significance <- function(.data,
 
   # comparison row
   compare_row <- .data %>%
-    dplyr::mutate(dplyr::across(dplyr::all_of(c("group", "response")), ~tolower(trimws(.)))) %>%
+    dplyr::mutate(dplyr::across(dplyr::all_of(c("group", "response")), ~ tolower(trimws(.)))) %>% # nolint
     dplyr::mutate(tmp = glue::glue("{group}::{response}")) %>%
     dplyr::filter(tmp %in% compare) %>%
-    dplyr::select(tmp_response = response,
-           compareN = N, compareV = value, compareVSE = value_se)
+    dplyr::select(
+      tmp_response = response,
+      compareN = N, compareV = value, compareVSE = value_se
+    )
 
   # if compare row is null, push out a warning and use overall instead
   if (nrow(compare_row) == 0) {
-    rlang::warn(glue::glue("The selected comparision does not exist in the data, defaulting to overall"))
+    rlang::warn(glue::glue("The selected comparision does not exist in the data, defaulting to overall")) # nolint
 
     return(test_significance(.data, "overall"))
   }
 
-  # If only one row is selected, it should be matched to all. If not then match by response
+  # If only one row is selected, it should be matched to all. If not then match by response # nolint
   if (nrow(compare_row) == 1) {
     # If only one single row is slected to be compared againgst
     significance_data <- .data %>%
-      dplyr::mutate(compareN = compare_row$compareN,
-             compareV = compare_row$compareV,
-             compareVSE = compare_row$compareVSE) %>%
-      dplyr::mutate(tmp_group = tolower(group),
-             tmp_response = tolower(response),
-             tmp_match = tolower(glue::glue("{tmp_group}::{tmp_response}")))
+      dplyr::mutate(
+        compareN = compare_row$compareN,
+        compareV = compare_row$compareV,
+        compareVSE = compare_row$compareVSE
+      ) %>%
+      dplyr::mutate(
+        tmp_group = tolower(group),
+        tmp_response = tolower(response),
+        tmp_match = tolower(glue::glue("{tmp_group}::{tmp_response}"))
+      )
   } else {
     significance_data <- .data %>%
-      dplyr::mutate(tmp_group = tolower(group),
-             tmp_response = tolower(response),
-             tmp_match = tolower(glue::glue("{tmp_group}::{tmp_response}"))) %>%
+      dplyr::mutate(
+        tmp_group = tolower(group),
+        tmp_response = tolower(response),
+        tmp_match = tolower(glue::glue("{tmp_group}::{tmp_response}"))
+      ) %>%
       dplyr::left_join(compare_row, by = c("tmp_response"))
   }
 
   significance_data <- significance_data %>%
-    dplyr::mutate(pvalue = purrr::pmap_dbl(list(N,
-                                  value,
-                                  value_se,
-                                  compareN,
-                                  compareV,
-                                  compareVSE), function(n, m, se, n0, m0, se0) {
-      tmp <- welch_ttest(
-        m1 = m,
-        m2 = m0,
-        s1 = se,
-        s2 = se0,
-        n1 = n,
-        n2 = n0
-      )
+    dplyr::mutate(
+      pvalue = purrr::pmap_dbl(list(
+        N,
+        value,
+        value_se,
+        compareN,
+        compareV,
+        compareVSE
+      ), function(n, m, se, n0, m0, se0) {
+        tmp <- welch_ttest(
+          m1 = m,
+          m2 = m0,
+          s1 = se,
+          s2 = se0,
+          n1 = n,
+          n2 = n0
+        )
 
-      tmp$p_value
+        tmp$p_value
       }),
       sgnf = dplyr::case_when(
         # Highlight row being compared against
@@ -84,47 +97,49 @@ test_significance <- function(.data,
 
         # Significance stars
         pvalue < 0.001 ~ "[***]",
-        pvalue < 0.05  ~ "[ **]",
-        pvalue < 0.1   ~ "[  *]",
-        TRUE           ~ "-----"
+        pvalue < 0.05 ~ "[ **]",
+        pvalue < 0.1 ~ "[  *]",
+        TRUE ~ "-----"
       )
     ) %>%
-    dplyr::select(-tmp_group,
-                -tmp_response,
-                -tmp_match,
-                -compareN,
-                -compareV,
-                -compareVSE)
+    dplyr::select(
+      -tmp_group,
+      -tmp_response,
+      -tmp_match,
+      -compareN,
+      -compareV,
+      -compareVSE
+    )
 
   return(significance_data)
 }
 
 welch_ttest <- function(m1,
-                         m2,
-                         s1,
-                         s2,
-                         n1,
-                         n2,
-                         m0 = 0,
-                         equal.variance = FALSE) {
+                        m2,
+                        s1,
+                        s2,
+                        n1,
+                        n2,
+                        m0 = 0,
+                        equal.variance = FALSE) { # nolint
 
   # correct for providing SE instead of SD
   s1 <- s1 * sqrt(n1)
   s2 <- s2 * sqrt(n2)
 
   if (equal.variance == FALSE) {
-    se <- sqrt( (s1^2/n1) + (s2^2/n2) )
+    se <- sqrt((s1^2 / n1) + (s2^2 / n2))
     # welch-satterthwaite df
-    df <- ((s1^2/n1 + s2^2/n2)^2)/((s1^2/n1)^2/(n1 - 1) + (s2^2/n2)^2/(n2 - 1))
+    df <- ((s1^2 / n1 + s2^2 / n2)^2) / ((s1^2 / n1)^2 / (n1 - 1) + (s2^2 / n2)^2 / (n2 - 1)) # nolint
   } else {
     # pooled standard deviation, scaled by the sample sizes
-    se <- sqrt((1/n1 + 1/n2) * ((n1 - 1) * s1^2 + (n2 - 1) * s2^2)/(n1 + n2 - 2) )
+    se <- sqrt((1 / n1 + 1 / n2) * ((n1 - 1) * s1^2 + (n2 - 1) * s2^2) / (n1 + n2 - 2)) # nolint
     df <- n1 + n2 - 2
   }
 
-  t <- (m1 - m2 - m0)/se
+  t <- (m1 - m2 - m0) / se
 
-  dat = tibble::tibble(
+  dat <- tibble::tibble(
     difference_of_means = (m1 - m2),
     std_error = se,
     t_value = t,

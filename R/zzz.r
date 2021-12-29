@@ -3,7 +3,7 @@
 #' Code to set up options for onload
 .onLoad <- function(libname, pkgname) {
   op <- options()
-  op.surveytools <- list(
+  op.surveytools <- list( # nolint
     surveytools.force_print = FALSE
   )
   toset <- !(names(op.surveytools) %in% names(op))
