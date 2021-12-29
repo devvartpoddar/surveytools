@@ -1,6 +1,6 @@
 # SurveyTools
 
-`surveytools` is a new tidyverse compiant package for survey analysis, comprising of miscellaneous functions used often for survey analysis at Dalberg[https://dalberg.com/]. We have used these tools internally to analyse multiple surveys and dataframes, as well as use as a base to build additional tools and GUI over. Please reach out to us for questions regarding use and example code. 
+`surveytools` is a new tidyverse compiant package for survey analysis, comprising of miscellaneous functions used often for survey analysis at [Dalberg](https://dalberg.com/). We have used these tools internally to analyse multiple surveys and dataframes, as well as use as a base to build additional tools and GUI over. Please reach out to us for questions regarding use and example code. 
 
 ## Functions
 
@@ -47,6 +47,6 @@ We provide two key functions that can be used for survey analysis:
 
 The function is pipping compliant -> the output of the function is always a dataframe.
 
-2. crosstab
+2. Crosstabs:
 
 `cross_tab` is our second primary function. It allows you to convert the tidy data recieved from the `summarise_base` function, into a more commonly discernable dataframe
